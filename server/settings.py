@@ -7,4 +7,4 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'too-much-secure'
-    SQLALCHEMY_DATABASE_URI = 'postgres://test:test@localhost/test_db'
+    SQLALCHEMY_DATABASE_URI = 'postgres://postgres:postgres@localhost/test_db'

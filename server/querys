@@ -1,1 +1,5 @@
 curl --header "Content-Type: application/json" --request GET --data '{"user_name": "test"}' http://localhost:8080/api/contacts
+
+
+
+curl --header "Content-Type: application/json" --request POST --data '{"name": "test", "sername": "setest"}' http://localhost:5000/author

@@ -10,6 +10,7 @@ DEBUG = True
 app = Flask(__name__)
 app.config.from_object('settings.Config')
 db = SQLAlchemy(app)
+db.create_all()
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
@@ -35,6 +36,9 @@ class Author(db.Model):
 
     books = db.relationship('Book', secondary=books, lazy='subquery',
         backref=db.backref('authors', lazy=True))
+
+    def __init__(self, **kwargs):
+        super(Author, self).__init__(**kwargs)
     
     def __repr__(self):
         return '<Book %r>' % self.username
@@ -56,10 +60,15 @@ def ping_pong():
 
 
 @app.route('/author', methods=['POST', 'GET'])
-def ping_pong():
+def author():
     if request.method == 'POST':
         data = request.get_json()
+        a = Author(**data)
+        db.session.add(a)
+        db.session.commit()
+        response = {'success': True}
     else:
+        print(Author.query.all())
         response = {'athor': 'hi'}
     return jsonify(response)
 
