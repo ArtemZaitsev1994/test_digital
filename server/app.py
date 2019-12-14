@@ -8,9 +8,8 @@ DEBUG = True
 
 # instantiate the app
 app = Flask(__name__)
-app.config.from_object('settings.Config')
+app.config.from_object('config.Config')
 db = SQLAlchemy(app)
-db.create_all()
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
@@ -22,11 +21,23 @@ books = db.Table('books',
 
 class Book(db.Model):
     book_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=False, nullable=False)
-    description = db.Column(db.Text(), unique=True, nullable=False)
+    name = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, **kwargs):
+        super(Book, self).__init__(**kwargs)
 
     def __repr__(self):
-        return '<Book %r>' % self.username
+        return f'<Book {self.name}>'
+
+    def to_dict(self):
+        data = {
+            'book_id': self.book_id,
+            'name': self.name,
+            'description': self.description,
+            'authors': [{'id': x.author_id, 'name': x.name} for x in self.authors]
+        }
+        return data
 
 
 class Author(db.Model):
@@ -41,8 +52,18 @@ class Author(db.Model):
         super(Author, self).__init__(**kwargs)
     
     def __repr__(self):
-        return '<Book %r>' % self.username
+        return f'<Author {self.name}>'
 
+    def to_dict(self):
+        data = {
+            'author_id': self.author_id,
+            'name': self.name,
+            'sername': self.sername,
+            'books': [{'id': x.book_id, 'name': x.name} for x in self.books]
+        }
+        return data
+
+db.create_all()
 
 def remove_book(book_id):
     for book in BOOKS:
@@ -59,18 +80,68 @@ def ping_pong():
     return jsonify('pong!')
 
 
-@app.route('/author', methods=['POST', 'GET'])
-def author():
-    if request.method == 'POST':
-        data = request.get_json()
-        a = Author(**data)
-        db.session.add(a)
-        db.session.commit()
-        response = {'success': True}
+@app.route('/authors', methods=['GET'])
+def authors_get():
+    author_id = request.args.get('id')
+    if author_id is None:
+        authors = [x.to_dict() for x in Author.query.all()]
+        response = {'authors': authors}
     else:
-        print(Author.query.all())
-        response = {'athor': 'hi'}
+        response = Author.query.get_or_404(author_id).to_dict()
     return jsonify(response)
+
+@app.route('/authors', methods=['POST'])
+def authors_post():
+    data = request.get_json()
+    a = Author(**data)
+    db.session.add(a)
+    db.session.commit()
+    response = {'success': True}
+    return jsonify(response)
+
+@app.route('/authors', methods=['PUT'])
+def authors_put():
+    pass
+
+@app.route('/authors', methods=['DELETE'])
+def authors_delete():
+    pass
+
+
+
+@app.route('/books', methods=['GET'])
+def books_get():
+    book_id = request.args.get('id')
+    if book_id is None:
+        books = [x.to_dict() for x in Book.query.all()]
+        response = {'books': books}
+    else:
+        response = Book.query.get_or_404(book_id).to_dict()
+    return jsonify(response)
+
+@app.route('/books', methods=['POST'])
+def books_post():
+    print(1)
+    data = request.get_json()
+    print(data)
+    b = Book(**data['book'])
+    db.session.add(b)
+
+    a = Author.query.get_or_404(data['author_id'])
+    a.books.append(b)
+    db.session.commit()
+    response = {'success': True}
+    return jsonify(response)
+
+@app.route('/books', methods=['PUT'])
+def books_put():
+    pass
+
+@app.route('/books', methods=['DELETE'])
+def books_delete():
+    pass
+
+
 
 
 @app.route('/books', methods=['GET', 'POST'])
