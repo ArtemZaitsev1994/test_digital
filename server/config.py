@@ -1,5 +1,8 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+# Number of items per page
+PAGINATE_VALUE = 3
 
 
 class Config(object):
@@ -7,5 +10,5 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'too-much-secure'
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@localhost/test_db?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://root:root@mysql/test_db?charset=utf8'
     FLASK_DEBUG=1
