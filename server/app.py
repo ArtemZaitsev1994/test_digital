@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -10,12 +10,10 @@ app = Flask(__name__)
 app.config.from_object('config.Config')
 
 
-
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 db = SQLAlchemy(app)
-db.create_all()
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
@@ -28,10 +26,10 @@ def ping_pong():
 
 if __name__ == '__main__':
     from authors.blueprint import authors
-    from books.blueprint import books
-    from models import Book
-    from models import Author
+    from books.blueprint import books as blueprint_books
+    from models import *
+    db.create_all()
 
     app.register_blueprint(authors)
-    app.register_blueprint(books)
-    app.run(debug=True)
+    app.register_blueprint(blueprint_books)
+    app.run(debug=True, port=8080, host='0.0.0.0')

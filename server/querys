@@ -27,7 +27,7 @@ curl --request GET http://localhost:5000/books
 curl --header "Content-Type: application/json" --data '{"book_id": 22, "rating": 5}' --request PATCH http://localhost:5000/books
 
 --PUT
-curl --header "Content-Type: application/json" --data '{"book_id": 2, "author_id": [1, 2]}' --request PUT http://localhost:5000/books
+curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://localhost:5000/books
 
 --DELETE
 curl --header "Content-Type: application/json" --data '{"id": 2}' --request DELETE http://localhost:5000/books

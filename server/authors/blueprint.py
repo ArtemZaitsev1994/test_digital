@@ -1,6 +1,7 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
+from marshmallow.exceptions import ValidationError
 
 from config import PAGINATE_VALUE
 from models import Author, Book

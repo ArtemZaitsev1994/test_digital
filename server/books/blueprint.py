@@ -5,7 +5,7 @@ from marshmallow.exceptions import ValidationError
 
 from config import PAGINATE_VALUE
 from models import Author, Book
-from schemas import AuthorSchemaExt, BookSchemaExt, AuthorAddBookSchema, AuthorIdList, BookRatingSchema, BookAddAuthorSchema
+from schemas import BookSchemaExt, AuthorIdList, BookRatingSchema, BookAddAuthorSchema
 from app import db
 
 

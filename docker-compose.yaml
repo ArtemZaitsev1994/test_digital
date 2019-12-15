@@ -3,7 +3,7 @@ services:
       server:
         build: ./server/
         ports: 
-          - 5000:5000
+          - 8080:8080
         container_name: server
         depends_on:
           - mongodb
@@ -25,4 +25,6 @@ services:
         ports:
           - '3306:3306'
         expose:
-          - '3306'
+          - '3306'    
+        volumes:
+          - ./db:/docker-entrypoint-initdb.d/:ro

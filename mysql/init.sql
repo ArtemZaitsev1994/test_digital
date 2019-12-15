@@ -1,0 +1,53 @@
+CREATE DATABASE IF NOT EXISTS test_db;
+USE test_db;
+CREATE TABLE IF NOT EXISTS book (
+	book_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+	name VARCHAR(80) NOT NULL, 
+	description TEXT NOT NULL, 
+	rating FLOAT DEFAULT 0, 
+	count_marks INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS author (
+	author_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+	name VARCHAR(80) NOT NULL, 
+	sername VARCHAR(80)
+);
+
+CREATE TABLE IF NOT EXISTS books (
+	book_id INTEGER NOT NULL, 
+	author_id INTEGER NOT NULL, 
+	PRIMARY KEY (book_id, author_id), 
+	FOREIGN KEY(book_id) REFERENCES book (book_id), 
+	FOREIGN KEY(author_id) REFERENCES author (author_id)
+);
+
+CREATE DATABASE IF NOT EXISTS testing;
+USE  testing;
+CREATE TABLE IF NOT EXISTS book (
+	book_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+	name VARCHAR(80) NOT NULL, 
+	description TEXT NOT NULL, 
+	rating FLOAT DEFAULT 0, 
+	count_marks INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS author (
+	author_id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+	name VARCHAR(80) NOT NULL, 
+	sername VARCHAR(80)
+);
+
+CREATE TABLE IF NOT EXISTS books (
+	book_id INTEGER NOT NULL, 
+	author_id INTEGER NOT NULL, 
+	PRIMARY KEY (book_id, author_id), 
+	FOREIGN KEY(book_id) REFERENCES book (book_id), 
+	FOREIGN KEY(author_id) REFERENCES author (author_id)
+);
+
+
+
+
+
+
