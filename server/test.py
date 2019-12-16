@@ -188,20 +188,45 @@ class TestCase(unittest.TestCase):
         assert rv.status == '200 OK'
 
     def test_get_author(self):
-        """Тест на получение авторов."""
-        pass
+        """Тест на получение автора по ID."""
+
+        a = Author.get_one_user(1)
+        rv = self.app.get('/authors?id=1')
+        assert rv.status == '200 OK'
+
+        print(rv)
 
     def test_get_list_of_authors(self):
         """Тест на получение списка авторов."""
-        pass
+
+        a = Author.get_one_user(1)
+        rv = self.app.get('/authors')
+        assert rv.status == '200 OK'
+
+    def test_pagination_authors(self):
+        """Тестирование работы пагинации при запросе авторов."""
+
+        rv = self.app.get('/authors?pagin=2&page=3')
+        assert rv.status == '200 OK'
+
+    def test_pagination_books(self):
+        """Тестирование работы пагинации при запросе книг."""
+
+        rv = self.app.get('/books?pagin=2&page=3')
+        assert rv.status == '200 OK'
 
     def test_get_book(self):
-        """Тест на получение пользователя."""
-        pass
+        """Тест на получение книги."""
+
+        b = Author.get_one_user(1)
+        rv = self.app.get('/books?id=1')
+        assert rv.status == '200 OK'
 
     def test_get_list_of_books(self):
-        """Тест на получение списка пользователей."""
-        pass
+        """Тест на получение списка книг."""
+
+        rv = self.app.get('/books?pagin=2&page=3')
+        assert rv.status == '200 OK'
 
 
 
