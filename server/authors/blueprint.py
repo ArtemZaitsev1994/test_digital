@@ -6,12 +6,11 @@ from marshmallow.exceptions import ValidationError
 from config import PAGINATE_VALUE
 from models import Author, Book
 from schemas import AuthorSchemaExt, AuthorAddBookSchema
-from app import db
 
 
 authors = Blueprint('authors', __name__, url_prefix='/authors')
 
-error_resp = {'success': False, 'message': ''}
+error_resp = {'success': False, 'message': '', 'validation_error': {}}
 success_resp = {'success': True, 'message': ''}
 
 
@@ -21,7 +20,11 @@ def authors_get():
     author_schema = AuthorSchemaExt()
 
     if author_id is not None and author_id.isdigit():
-        author = Author.query.get_or_404(author_id)
+        author = Author.get_one_user(author_id)
+        if author is None:
+            response = success_resp
+            response['message'] = f'No book found with id={author_id}'
+            return jsonify(response)
         response = author_schema.dump(author)
     else:
         page = request.args.get('page')
@@ -35,6 +38,8 @@ def authors_get():
             per_page=PAGINATE_VALUE
         )
         data = author_schema.dump(authors.items, many=True)
+        for a in data:
+            a['books'] = [x for x in sorted(a['books'], key=lambda y: y['rating'], reverse=True)[:5]]
 
         response = {
             'authors': data,
@@ -57,7 +62,8 @@ def authors_post():
     try:
         a = author_schema.load(req_data)
     except ValidationError as e:
-        error_resp['message'] = e.messages
+        error_resp['validation_error'] = e.messages
+        error_resp['message'] = 'Validation error.'
         return jsonify(error_resp)
 
     a.save()
@@ -73,7 +79,8 @@ def authors_put():
     try:
         a, books_id = schema.load(data)
     except ValidationError as e:
-        error_resp['message'] = e.messages
+        error_resp['validation_error'] = e.messages
+        error_resp['message'] = 'Validation error.'
         return jsonify(error_resp)
 
     list_b = Book.query.filter(Book.book_id.in_(books_id))

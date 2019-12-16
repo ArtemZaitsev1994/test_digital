@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from app import app, db
@@ -17,24 +16,200 @@ class TestCase(unittest.TestCase):
         self.app = app.test_client()
 
         db.create_all()
+        self.fill_db()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+    def fill_db(self):
+        a = [Author({'name': 'Default', 'sername': 'Author'}) for x in range(10)]
+        b = [Book({'name': 'Default', 'Description': 'Book'}).save() for x in range(10)]
+        a[0].books.append(b[0])
+        a[1].books.extend(b)
+        [x.save() for x in a]
 
     def test_messages(self):
         rv = self.app.get('/ping', follow_redirects=True)
         assert rv.status == '200 OK'
 
     def test_create_author(self):
-        data = {"name": "Artem", "sername": "Zaitsev"}
+        """Тест создания автора книг."""
+
+        data = {'name': 'Artem', 'sername': 'Zaitsev'}
         rv = self.app.post('/authors', json=data)
-        assert len(Author.query.all()) == 1
-        a = Author.get_one_user(1)
+        assert rv.status == '200 OK'
+        assert len(Author.query.all()) == 11
+        a = Author.get_one_user(11)
         assert a.name == data['name'] 
         assert a.sername == data['sername'] 
-        assert len(a.books) == 0 
+        assert len(a.books) == 0
+    
+    def test_negative_create_author(self):
+        """Негативный тест создания автора книг."""
+
+        assert len(Author.query.all()) == 10
+
+        data = {'name': 1, 'sername': 'Zaitsev'}
+        rv = self.app.post('/authors', json=data)
         assert rv.status == '200 OK'
+        assert len(Author.query.all()) == 10
+
+        data = {'name': 'Artem', 'sername': 1}
+        rv = self.app.post('/authors', json=data)
+        assert rv.status == '200 OK'
+        assert len(Author.query.all()) == 10
+        
+    def test_create_book(self):
+        """Тест создания книги. Книга не может быть создана без автора."""
+
+        data = {'name': 'Kolobok', 'Description': 'The story about bread.', 'authors': [1, 2]}
+        rv = self.app.post('/books', json=data)
+        assert rv.status == '200 OK'
+        assert len(Book.query.all()) == 10
+        b = Book.get_one_user(11)
+        assert b.name == data['name']
+        assert len(b.authors) == 2
+
+        a1 = Author.get_one_user(1)
+        assert a1 in b.authors
+        a2 = Author.get_one_user(2)
+        assert a2 in b.authors
+
+    def test_negative_book_create(self):
+        """Негативный тест создания книги."""
+
+        assert len(Book.query.all()) == 10
+
+        data = {'name': 'Kolobok', 'Description': 'The story about bread.', 'authors': []}
+        rv = self.app.post('/books', json=data)
+        assert rv.status == '200 OK'
+        assert len(Book.query.all()) == 10
+
+    def test_add_book_to_author(self):
+        """Тест на добавление книги к автору."""
+
+        a2 = Author.get_one_user(3)
+        assert len(a2.books) == 0
+
+        data = {"author_id": 3, "book_id": [1]}
+        rv = self.app.put('/authors', json=data)
+        assert rv.status == '200 OK'
+        b = Book.get_one_user(2)
+        assert b in a2.books
+
+    def test_add_book_to_author_negative(self):
+        """Негативный тест на добавление книги к автору."""
+
+        a2 = Author.get_one_user(2)
+        assert len(a2.books) == 0
+
+        data = {"author_id": 12, "book_id": [1]}
+        rv = self.app.put('/authors', json=data)
+        assert rv.status == '200 OK'
+        assert len(a2.books) == 0
+
+    def test_add_author_to_book(self):
+        """Тест на добавление авторов к книге."""
+
+        b = Book.get_one_user(2)
+        assert len(b.authors) == 1
+
+        data = {"book_id": 2, "author_id": [3]}
+        rv = self.app.put('/books', json=data)
+        assert rv.status == '200 OK'
+
+        a2 = Author.get_one_user(3)
+        assert a2 in b.authors
+
+    def test_add_author_to_book_negative(self):
+        """Негативный тест на добавление авторов к книге."""
+
+        b = Book.get_one_user(3)
+        assert len(b.authors) == 0
+
+        data = {"book_id": 2, "author_id": [22]}
+        rv = self.app.put('/books', json=data)
+        assert rv.status == '200 OK'
+        assert len(b.authors) == 0
+
+    def test_change_book_rating(self):
+        """Тест на изменение рейтинга книги."""
+
+        b = Book.get_one_user(1)
+        assert b.rating == 0
+        assert b.count_marks == 0
+
+        data = {"book_id": 1, "rating": 5}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        assert b.rating == 5
+        assert b.count_marks == 1
+
+        data = {"book_id": 1, "rating": 5}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        assert b.rating == 5
+        assert b.count_marks == 2
+
+        data = {"book_id": 1, "rating": 2}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        assert b.rating == 4
+        assert b.count_marks == 3
+
+        data = {"book_id": 1, "rating": 2}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        assert b.rating == 3.5
+        assert b.count_marks == 4
+
+    def test_change_book_rating_negative(self):
+        """Тест на изменение рейтинга книги."""
+
+        b = Book.get_one_user(1)
+        assert b.rating == 0
+        assert b.count_marks == 0
+
+        data = {"book_id": 1, "rating": 6}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        data = {"book_id": 1, "rating": 0}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+        data = {"book_id": 1, "rating": 3.13541314}
+        rv = self.app.patch('/books', json=data)
+        assert rv.status == '200 OK'
+
+    def test_get_author(self):
+        """Тест на получение авторов."""
+        pass
+
+    def test_get_list_of_authors(self):
+        """Тест на получение списка авторов."""
+        pass
+
+    def test_get_book(self):
+        """Тест на получение пользователя."""
+        pass
+
+    def test_get_list_of_books(self):
+        """Тест на получение списка пользователей."""
+        pass
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
@@ -42,12 +217,12 @@ if __name__ == '__main__':
 
 
 # def test_example(client):
-#     response = client.get("/")
+#     response = client.get('/')
 #     assert response.status_code == 200
 
 # def test_create_author(client):
-#     data = {"name": "Artem", "sername": "Zaitsev"}
-#     response = client.post("/authors", json=data)
+#     data = {'name': 'Artem', 'sername': 'Zaitsev'}
+#     response = client.post('/authors', json=data)
 #     assert response.status_code == 200
 
 
@@ -94,7 +269,7 @@ if __name__ == '__main__':
 #     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost/testing?charset=utf8'
 #     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-#     @app.route("/", methods=["POST", "GET"])
+#     @app.route('/', methods=['POST', 'GET'])
 #     def root():
 #         return jsonify('pong')
 
@@ -196,12 +371,12 @@ if __name__ == '__main__':
 #         db.drop_all()
 
 # def test_example(client):
-#     response = client.get("/")
+#     response = client.get('/')
 #     assert response.status_code == 200
 
 # def test_create_author(client):
-#     data = {"name": "Artem", "sername": "Zaitsev"}
-#     response = client.post("/authors", json=data)
+#     data = {'name': 'Artem', 'sername': 'Zaitsev'}
+#     response = client.post('/authors', json=data)
 #     assert response.status_code == 200
 
 

@@ -20,15 +20,15 @@ class Book(db.Model):
     def __repr__(self):
         return f'<Book {self.name}>'
 
-    def to_dict(self):
-        data = {
-            'book_id': self.book_id,
-            'name': self.name,
-            'description': self.description,
-            'authors': [{'id': x.author_id, 'name': x.name} for x in self.authors],
-            'rating': self.rating,
-        }
-        return data
+    # def to_dict(self):
+    #     data = {
+    #         'book_id': self.book_id,
+    #         'name': self.name,
+    #         'description': self.description,
+    #         'authors': [{'id': x.author_id, 'name': x.name} for x in self.authors],
+    #         'rating': self.rating,
+    #     }
+    #     return data
 
     def delete(self):
         pass
@@ -56,18 +56,18 @@ class Author(db.Model):
     def __repr__(self):
         return f'<Author {self.name}>'
 
-    def to_dict(self):
-        data = {
-            'author_id': self.author_id,
-            'name': self.name,
-            'sername': self.sername,
-            'books': [
-                {'id': x.book_id, 'name': x.name}
-                for x
-                in sorted(self.books, key=lambda x: x.rating, reverse=True)[:5]
-            ]
-        }
-        return data
+    # def to_dict(self):
+    #     data = {
+    #         'author_id': self.author_id,
+    #         'name': self.name,
+    #         'sername': self.sername,
+    #         'books': [
+    #             {'id': x.book_id, 'name': x.name}
+    #             for x
+    #             in sorted(self.books, key=lambda x: x.rating, reverse=True)[:5]
+    #         ]
+    #     }
+    #     return data
 
     def save(self):
         db.session.add(self)

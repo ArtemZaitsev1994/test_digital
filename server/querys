@@ -17,6 +17,7 @@ curl --header "Content-Type: application/json" --data '{"author_id": 16, "book_i
 /books:
 
 --POST
+curl --header "Content-Type: application/json" --request POST --data '{"name": "test book", "description": "lorem xho to tam ipsem asdf", "authors": [1, 2]}' http://localhost:5000/books
 curl --header "Content-Type: application/json" --request POST --data '{"book":{"name": "test book", "description": "lorem xho to tam ipsem asdf"}, "author_id": [1, 2]}' http://localhost:5000/books
 
 --GET

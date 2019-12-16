@@ -6,7 +6,6 @@ from marshmallow.exceptions import ValidationError
 from config import PAGINATE_VALUE
 from models import Author, Book
 from schemas import BookSchemaExt, AuthorIdList, BookRatingSchema, BookAddAuthorSchema
-from app import db
 
 
 books = Blueprint('books', __name__, url_prefix='/books')
@@ -21,7 +20,11 @@ def books_get():
     book_schema = BookSchemaExt()
 
     if book_id is not None and book_id.isdigit():
-        book = Book.query.get_or_404(book_id)
+        book = Author.get_one_user(book_id)
+        if book is None:
+            response = success_resp
+            response['message'] = f'No book found with id={book_id}'
+            return jsonify(response)
         response = book_schema.dump(book)
     else:
         page = request.args.get('page')
@@ -50,31 +53,38 @@ def books_get():
 
 @books.route('', methods=['POST', 'PUT'])
 def books_post():
+    """Создание/изменение книги книги"""
     data = request.get_json()
 
     if request.method == 'POST':
+        """Создание книги"""
         book_schema = BookSchemaExt()
         schema = AuthorIdList()
 
         try:
             b = book_schema.load(data['book'])
+            # b = book_schema.load(data)
         except ValidationError as e:
-            error_resp['message'] = e.messages
+            error_resp['validation_error'] = e.messages
+            error_resp['message'] = 'Validation error.'
             return jsonify(error_resp)
 
         try:
             author_id = schema.load({'author_id': data['author_id']})
         except ValidationError as e:
-            error_resp['message'] = e.messages
+            error_resp['validation_error'] = e.messages
+            error_resp['message'] = 'Validation error.'
             return jsonify(error_resp)
 
 
     elif request.method == 'PUT':
+        """Добавление авторов книги"""
         schema = BookAddAuthorSchema()
         try:
             b, author_id = schema.load(data)
         except ValidationError as e:
-            error_resp['message'] = e.messages
+            error_resp['validation_error'] = e.messages
+            error_resp['message'] = 'Validation error.'
             return jsonify(error_resp)
 
 
@@ -99,7 +109,8 @@ def books_patch():
     try:
         b, rating = schema.load(data)
     except ValidationError as e:
-        error_resp['message'] = e.messages
+        error_resp['validation_error'] = e.messages
+        error_resp['message'] = 'Validation error.'
         return jsonify(error_resp)
 
     if b is None:

@@ -4,6 +4,7 @@ from models import Author, Book
 
 
 class BookSchema(Schema):
+    """Основаня схема книги"""
     book_id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(required=True)
@@ -12,12 +13,14 @@ class BookSchema(Schema):
 
 
 class AuthorSchema(Schema):
+    """Основаня схема автора"""
     author_id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     sername = fields.Str(required=True)
 
 
 class BookSchemaExt(BookSchema):
+    """Расширение схемы книги полем 'автор'."""
     authors = fields.Nested(AuthorSchema, many=True)
 
     @post_load
@@ -26,6 +29,7 @@ class BookSchemaExt(BookSchema):
 
 
 class AuthorSchemaExt(AuthorSchema):
+    """Расширение схемы автора полем 'книги'."""
     books = fields.Nested(BookSchema, many=True)
 
     @post_load
@@ -54,6 +58,7 @@ class BookAddAuthorSchema(Schema):
 
 
 class AuthorIdList(Schema):
+    """Схема для валидации ID авторов."""
     author_id = fields.List(
         fields.Int,
         required=True,
@@ -66,6 +71,7 @@ class AuthorIdList(Schema):
 
 
 class BookRatingSchema(Schema):
+    """Схема для валидации изменения рейтинга книги."""
     book_id = fields.Int(required=True)
     rating = fields.Int(
         required=True, 
