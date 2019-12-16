@@ -115,7 +115,7 @@ id - int
 ```
 {
   'success': False,
-  'message': 'No book found with id=<id>'
+  'message': str
 }
 ```
 * `message` - Сообщение об ошибке.
@@ -136,7 +136,7 @@ page - int
 pagin - int
 ```
 * `page` - номер страницы.
-* `id` - количество авторов на странице, по умолчанию 3.
+* `pagin` - количество авторов на странице, по умолчанию 3.
 
 #### Success response
 ```
@@ -177,45 +177,6 @@ pagin - int
 * `pagination.prev_num` - Номер предыдущей страницы.
 * `pagination.pages` - Всего количество страниц.
 
-### Добавление книги к автору:
-#### Curl пример
-```
-curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://0.0.0.0:8080/authors
-```
-#### URL
-`http://0.0.0.0:8080/authors`
-#### Тип запроса
-`PUT`
-#### JSON request data
-```
-{
-  "author_id": int,
-  "book_id": [int, ]
-}
-```
-* `author_id` - ID автора.
-* `book_id` - ID книги.
-
-#### Success response
-```
-{
-  'success': True,
-  'message': str,
-}
-```
-* `message` - Сообщение о том, какие книги были добавлены.
-
-#### Fail response
-```
-{
-  'success': False,
-  'message': str,
-  'validation_error': dict[str, str]
-}
-```
-* `message` - Сообщение ошибки.
-* `validation_error` - Словарь ошибок.
-
 ### Создание книги:
 #### Curl пример
 ```
@@ -245,6 +206,45 @@ curl --header "Content-Type: application/json" --request POST --data '{"book": {
 }
 ```
 * `message` - Сообщение о том, какие авторы были найдены и к которым была добавлена книга.
+
+#### Fail response
+```
+{
+  'success': False,
+  'message': str,
+  'validation_error': dict[str, str]
+}
+```
+* `message` - Сообщение ошибки.
+* `validation_error` - Словарь ошибок.
+
+### Добавление книги к автору:
+#### Curl пример
+```
+curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://0.0.0.0:8080/authors
+```
+#### URL
+`http://0.0.0.0:8080/authors`
+#### Тип запроса
+`PUT`
+#### JSON request data
+```
+{
+  "author_id": int,
+  "book_id": [int, ]
+}
+```
+* `author_id` - ID автора.
+* `book_id` - Список ID книг.
+
+#### Success response
+```
+{
+  'success': True,
+  'message': str,
+}
+```
+* `message` - Сообщение о том, какие книги были добавлены.
 
 #### Fail response
 ```
@@ -451,7 +451,7 @@ pagin - int
 }
 ```
 * `book_id` - ID книги.
-* `rating` - Оценка книги.
+* `rating` - Оценка книги (целове число от 1 до 5).
 
 #### Success response
 ```
