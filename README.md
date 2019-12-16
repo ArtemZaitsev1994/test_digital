@@ -406,8 +406,7 @@ pagin - int
 
 ### Добавление оценки к книге:
 #### Curl пример
-```
-curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://localhost:5000/books```
+```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://localhost:5000/books```
 #### URL
 `http://localhost:8080/books`
 #### Тип запроса
