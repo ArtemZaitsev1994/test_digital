@@ -294,7 +294,42 @@ curl --header "Content-Type: application/json" --request POST --data '{"book": {
 * `message` - Сообщение ошибки.
 * `validation_error` - Словарь ошибок.
 
+### Убрать связь между книгой и автором:
+#### Curl пример
+`curl --header "Content-Type: application/json" --data '{"book_id": 1, "author_id": 1}' --request PUT http://0.0.0.0:8080/authors`
+#### URL
+`http://0.0.0.0:8080/authors`
+#### Тип запроса
+`PATCH`
+#### JSON request data
+```
+{
+  "book_id": int,
+  "author_id": int
+}
+```
+* `book_id` - ID книги.
+* `author_id` - ID автора.
 
+#### Success response
+```
+{
+  'success': True,
+  'message': str,
+}
+```
+* `message` - Сообщение.
+
+#### Fail response
+```
+{
+  'success': False,
+  'message': str,
+  'validation_error': dict[str, str]
+}
+```
+* `message` - Сообщение ошибки.
+* `validation_error` - Словарь ошибок.
 
 #### Получение книги:
 #### Curl пример
@@ -344,8 +379,6 @@ id - int
 }
 ```
 * `message` - Сообщение об ошибке.
-
-
 
 #### Получение списка книг:
 #### Curl пример
@@ -403,8 +436,6 @@ pagin - int
 * `pagination.prev_num` - Номер предыдущей страницы.
 * `pagination.pages` - Всего количество страниц.
 
-
-
 ### Добавление оценки к книге:
 #### Curl пример
 ```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://0.0.0.0:8080/books```
@@ -447,13 +478,22 @@ pagin - int
 * `validation_error` - Словарь ошибок.
 
 ## Тесты
-Для приложения подготовлены небольшие тесты. Тесты следует запускать при развернутом в Docker приложении, чтобы работа проводилась с развернутыми базами данных в контейнерах, дабы избежать потери данных.
+Для приложения подготовлены небольшие тесты. Тесты следует запускать при развернутой в Docker базе данных, дабы избежать потери данных.
 
 Разоваричаем проект:
 > sudo docker-compose up --build -d
 
 Останавливаем сервер:
-> sudo docker server stop
+> sudo docker stop server
+
+Разворачиваем виртуальное окружение:
+> python3 -m venv env
+
+Активируем виртуальное окружение:
+> source env/bin/activate
 
 Переходим в папку с тестами:
 > cd server
+
+Запускаем тесты:
+> python test.py
