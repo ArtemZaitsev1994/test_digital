@@ -133,6 +133,9 @@ def authors_patch():
     if b is None:
         e_response['message'] = f'Not found book with id={data["book_id"]}.'
         return jsonify(e_response)
+    if len(b.authors) == 1:
+        e_response['message'] = f'Book have only one author. Its impossible to delete last author.'
+        return jsonify(e_response)
 
     try:
         a.books.remove(b)

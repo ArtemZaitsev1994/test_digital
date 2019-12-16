@@ -132,27 +132,33 @@ class TestCase(unittest.TestCase):
         a = Author.get_one_item(3)
         assert len(a.books) == 1
 
-    def test_add_book_to_author(self):
+    def test_delete_book_from_author(self):
         """Тест на разрыв связи книги и автора."""
 
-        a = Author.get_one_item(1)
+        a = Author.get_one_item(2)
         b = Book.get_one_item(1)
         assert b in a.books
 
-        data = {"author_id": 1, "book_id": 1}
+        data = {"author_id": 2, "book_id": 1}
         rv = self.app.patch('/authors', json=data)
         json_resp = rv.get_json()
         assert json_resp['success']
         assert rv.status == '200 OK'
 
-        a = Author.get_one_item(1)
+        a = Author.get_one_item(2)
         b = Book.get_one_item(1)
         assert b not in a.books
 
-    def test_add_book_to_author_negative(self):
+    def test_delete_book_from_author_negative(self):
         """Негативный тест на разрыв связи книги и автора."""
 
         data = {"author_id": 1, "book_id": 4}
+        rv = self.app.patch('/authors', json=data)
+        json_resp = rv.get_json()
+        assert not json_resp['success']
+        assert rv.status == '200 OK'
+
+        data = {"author_id": 1, "book_id": 1}
         rv = self.app.patch('/authors', json=data)
         json_resp = rv.get_json()
         assert not json_resp['success']
