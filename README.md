@@ -37,7 +37,7 @@
 curl --header "Content-Type: application/json" --request POST --data '{"name": "Artem", "sername": "Zaitsev"}' http://localhost:5000/authors
 ```
 #### URL
-`http://localhost:8080/api/contacts`
+`http://localhost:8080/authors`
 #### Тип запроса
 `POST`
 #### JSON request data
@@ -258,8 +258,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"name": "
 
 ### Добавление автора к книге:
 #### Curl пример
-```
-curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://localhost:5000/books```
+`curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://localhost:5000/books`
 #### URL
 `http://localhost:8080/books`
 #### Тип запроса
@@ -446,112 +445,6 @@ curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 
 ```
 * `message` - Сообщение ошибки.
 * `validation_error` - Словарь ошибок.
-
-
-
-
-
-
-
-
-### Отправка сообщений:
-#### Curl пример
-```
-curl --header "Content-Type: application/json" --request PUT --data '{"user_name": "test", "contacts": ["Artem", "Lera", "Vasya"], "message": "Hello there", "time": [2019, 11, 30, 14, 0, 6]}' http://localhost:8080/api/contacts
-```
-#### URL
-`http://localhost:8080/api/contacts`
-#### JSON request data
-```
-{
-  'user_name': str,
-  'contacts': list[name: str, ...],
-  'message': str,
-  'time': list[int, int, int, int, int, int],
-}
-```
-* `user_name` - Имя, под которым выполняется запрос.
-* `contact` - список имён контактов, кому хотим отправить сообщение.
-* `message` - текст сообщения.
-* `time` - время, не раньше которого нужно начать отправку (текущее или раньше, чтобы отправить при получении).
-
-#### Response
-```
-{
-  'success': bool,
-  'wrong_contacts': [{
-    'name': str,
-    'error': str,
-  }, ...]
-}
-```
-* `success` - булево значение, возвращает True, только если сообщения удачно разосланы всем контактам.
-* `wrong_contacts` - список контактов, кому не удалось разослать сообщения.
-* `wrong_contacts.name` - имя контакта.
-* `wrong_contacts.error` - текст ошибки.
-
-### Получить список своих контактов:
-#### Curl пример
-```
-curl --header "Content-Type: application/json" --request GET --data '{"user_name": "test"}' http://localhost:8080/api/contacts
-```
-#### URL
-`http://localhost:8080/api/contacts`
-#### JSON request data
-```
-{
-  'user_name': str,
-}
-```
-* `user_name` - Имя, под которым выполняется запрос.
-#### Response
-```
-{
-  'contacts': {
-    name: {
-      'telegram': str,
-      'whatsApp': str,
-      'viber': str,
-    },
-  }
-}
-```
-* `contacts` - словарь контактов, ключами в котором являются имена контактов.
-* `contacts[name].telegram` - идентификатор в Telegram.
-* `contacts[name].whatsApp` - идентификатор в WhatsApp.
-* `contacts[name].viber` - идентификатор в Viber.
-
-### Получить недоставленные сообщения:
-#### Curl пример
-```
-curl --header "Content-Type: application/json" --request GET --data '{"user_name": "test"}' http://localhost:8080/api/get_failed_mess
-```
-#### URL
-`http://localhost:8080/api/get_failed_mess`
-#### JSON request data
-```
-{
-  'user_name': str,
-}
-```
-* `user_name` - Имя, под которым выполняется запрос.
-#### Response
-```
-{
-  'data': {
-    'sender': 'test',
-    'message': 'f',
-    'contact': 'asd',
-    'url': 'http://0.0.0.0:8081/viber',
-    'time': [2019, 11, 30, 13, 19, 18]
-  }
-}
-```
-* `data.sender` - юзер из под которого было создано сообщение.
-* `data.message` - текст сообщения.
-* `data.contact` - имя контакта, которому было адресовано сообщение.
-* `data.url` - адрес сервиса, на который была попытка отправить.
-* `data.time` - время, на которое было назначена отправка.
 
 ## Тесты
 Для приложения подготовлены небольшие тесты. Тесты следует запускать при развернутом в Docker приложении, чтобы работа проводилась с развернутыми базами данных в контейнерах, дабы избежать потери данных.
