@@ -5,7 +5,7 @@ from marshmallow.exceptions import ValidationError
 
 from config import PAGINATE_VALUE
 from models import Author, Book
-from schemas import AuthorSchemaExt, AuthorAddBookSchema
+from schemas import AuthorSchemaExt, AuthorAddBookSchema, BookDelAuthorSchema
 
 
 authors = Blueprint('authors', __name__, url_prefix='/authors')
@@ -109,4 +109,37 @@ def authors_put():
         a.books.append(b)
     a.save()
     s_response['message'] = f'Books was found with id: {", ".join([str(x) for x in found_books])}.'
+    return jsonify(s_response)
+
+
+@authors.route('', methods=['PATCH'])
+def authors_patch():
+    """Удалить связь книги к автором."""
+    data = request.get_json()
+    schema = BookDelAuthorSchema()
+    e_response = error_resp
+    s_response = success_resp
+
+    try:
+        b, a = schema.load(data)
+    except ValidationError as e:
+        e_response['validation_error'] = e.messages
+        e_response['message'] = 'Validation error.'
+        return jsonify(e_response)
+
+    if a is None:
+        e_response['message'] = f'Not found author with id={data["author_id"]}.'
+        return jsonify(e_response)
+    if b is None:
+        e_response['message'] = f'Not found book with id={data["book_id"]}.'
+        return jsonify(e_response)
+
+    try:
+        a.books.remove(b)
+    except ValueError:
+        e_response['message'] = f'Author with id={data["author_id"]} isn\'t the author of book with id={data["book_id"]}.'
+        return jsonify(e_response)
+
+    s_response['message'] = f'Author with id={data["author_id"]} was removed from book.'
+    a.save()
     return jsonify(s_response)

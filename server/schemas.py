@@ -57,6 +57,17 @@ class BookAddAuthorSchema(Schema):
         return b, data['author_id']
 
 
+class BookDelAuthorSchema(Schema):
+    book_id = fields.Int(required=True)
+    author_id = fields.Int(required=True)
+
+    @post_load
+    def make_author(self, data, **kwargs):
+        b = Book.get_one_item(data['book_id'])
+        a = Author.get_one_item(data['author_id'])
+        return b, a
+
+
 class AuthorIdList(Schema):
     """Схема для валидации ID авторов."""
     author_id = fields.List(

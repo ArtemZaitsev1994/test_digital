@@ -9,6 +9,7 @@ services:
           - mongodb
         environment:
           WAIT_HOSTS: mysql:3306
+          WAIT_HOSTS_TIMEOUT: 600
         volumes:
           - /etc/localtime:/etc/localtime:ro
         depends_on:
@@ -19,7 +20,6 @@ services:
         container_name: "mysql"
         environment:
           MYSQL_DATABASE: 'test_db'
-          MYSQL_USER: 'root'
           MYSQL_PASSWORD: 'root'
           MYSQL_ROOT_PASSWORD: 'root'
         ports:
