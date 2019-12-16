@@ -8,7 +8,7 @@ class BookSchema(Schema):
     book_id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     description = fields.Str(required=True)
-    rating = fields.Int()
+    rating = fields.Float()
     count_marks = fields.Int()
 
 

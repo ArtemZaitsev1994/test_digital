@@ -1,6 +1,3 @@
-import os
-
-
 # Number of items per page
 PAGINATE_VALUE = 3
 

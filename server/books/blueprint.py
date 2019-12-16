@@ -10,16 +10,18 @@ from schemas import BookSchemaExt, AuthorIdList, BookRatingSchema, BookAddAuthor
 
 books = Blueprint('books', __name__, url_prefix='/books')
 
-error_resp = {'success': False, 'message': ''}
+error_resp = {'success': False, 'message': '', 'validation_error': {}}
 success_resp = {'success': True, 'message': ''}
 
 
 @books.route('', methods=['GET'])
 def books_get():
+    """Получение книг"""
     book_id = request.args.get('id')
     book_schema = BookSchemaExt()
 
     if book_id is not None and book_id.isdigit():
+        # Получить книгу по ID
         book = Author.get_one_user(book_id)
         if book is None:
             response = success_resp
@@ -27,15 +29,22 @@ def books_get():
             return jsonify(response)
         response = book_schema.dump(book)
     else:
+        # Получить все книги
         page = request.args.get('page')
         if page and page.isdigit():
             page = int(page)
         else:
             page = 1
 
+        pagin = request.args.get('pagin')
+        if pagin and pagin.isdigit():
+            pagin = int(page)
+        else:
+            pagin = PAGINATE_VALUE
+
         books = Book.query.filter().paginate(
             page=page,
-            per_page=PAGINATE_VALUE
+            per_page=pagin
         )
         data = book_schema.dump(books.items, many=True)
         response = {
@@ -103,6 +112,7 @@ def books_post():
 
 @books.route('', methods=['PATCH'])
 def books_patch():
+    """Добавление оценки к книге"""
     data = request.get_json()
     schema = BookRatingSchema()
    
@@ -124,8 +134,3 @@ def books_patch():
     success_resp['rating'] = b.rating
     success_resp['votes'] = b.count_marks
     return jsonify(success_resp)
- 
-
-@books.route('', methods=['DELETE'])
-def books_delete():
-    pass

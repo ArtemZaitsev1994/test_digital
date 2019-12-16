@@ -1,6 +1,7 @@
 from app import db
 
 
+# Таблица для связи МногиеКоМногим авторов и книг
 books = db.Table('books',
     db.Column('book_id', db.Integer, db.ForeignKey('book.book_id'), primary_key=True),
     db.Column('author_id', db.Integer, db.ForeignKey('author.author_id'), primary_key=True)
@@ -8,6 +9,7 @@ books = db.Table('books',
 
 
 class Book(db.Model):
+    """Описание модели книг"""
     book_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.Text(), nullable=False)
@@ -19,16 +21,6 @@ class Book(db.Model):
 
     def __repr__(self):
         return f'<Book {self.name}>'
-
-    # def to_dict(self):
-    #     data = {
-    #         'book_id': self.book_id,
-    #         'name': self.name,
-    #         'description': self.description,
-    #         'authors': [{'id': x.author_id, 'name': x.name} for x in self.authors],
-    #         'rating': self.rating,
-    #     }
-    #     return data
 
     def delete(self):
         pass
@@ -43,6 +35,7 @@ class Book(db.Model):
 
 
 class Author(db.Model):
+    """Описание модели автор"""
     author_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=False, nullable=False)
     sername = db.Column(db.String(80), unique=False, nullable=True)
@@ -55,19 +48,6 @@ class Author(db.Model):
     
     def __repr__(self):
         return f'<Author {self.name}>'
-
-    # def to_dict(self):
-    #     data = {
-    #         'author_id': self.author_id,
-    #         'name': self.name,
-    #         'sername': self.sername,
-    #         'books': [
-    #             {'id': x.book_id, 'name': x.name}
-    #             for x
-    #             in sorted(self.books, key=lambda x: x.rating, reverse=True)[:5]
-    #         ]
-    #     }
-    #     return data
 
     def save(self):
         db.session.add(self)

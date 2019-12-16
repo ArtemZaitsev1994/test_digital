@@ -33,9 +33,15 @@ def authors_get():
         else:
             page = 1
 
+        pagin = request.args.get('pagin')
+        if pagin and pagin.isdigit():
+            pagin = int(page)
+        else:
+            pagin = PAGINATE_VALUE
+
         authors = Author.query.filter().paginate(
             page=page,
-            per_page=PAGINATE_VALUE
+            per_page=pagin
         )
         data = author_schema.dump(authors.items, many=True)
         for a in data:
@@ -56,6 +62,7 @@ def authors_get():
 
 @authors.route('', methods=['POST'])
 def authors_post():
+    """Создание автора."""
     req_data = request.get_json()
     author_schema = AuthorSchemaExt()
 
@@ -73,6 +80,7 @@ def authors_post():
 
 @authors.route('', methods=['PUT'])
 def authors_put():
+    """Добавить книгу к автору."""
     data = request.get_json()
     schema = AuthorAddBookSchema()
 
@@ -95,8 +103,3 @@ def authors_put():
     a.save()
     success_resp['message'] = f'Books was found with id: {", ".join([str(x) for x in found_books])}.'
     return jsonify(success_resp)
-
-
-@authors.route('', methods=['DELETE'])
-def authors_delete():
-    pass

@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_sqlalchemy import SQLAlchemy
@@ -8,10 +7,6 @@ from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
-
-
-# enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
