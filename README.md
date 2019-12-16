@@ -10,12 +10,13 @@
 Сервер работает на Flask-фреймворке. В качестве базы данных выступает mysql.
 
 Перменные окружения для приложения указаны в /server/.env файле.
-* `MONGO_HOST` - Хост базы данных MongoDB
-* `MONGO_DB_NAME` - Имя рабочей базы данных
-* `RETRIES_TIMES` - Количество повторов при неудачной отправке сообщений
-* `MESSENGER_HOST` - Хост сервера с мессенджерами
-* `REDIS_HOST` - Адрес Redis-server
-* `WAIT_BETWEEN_REQUESTS` - Время между попытками отправить запрос (секунд)
+* `DEBUG` - Включить\выключить debug-mode.
+* `TESTING` - Режим тестирования.
+* `CSRF_ENABLED` - Поддержка CSRF.
+* `SECRET_KEY` - Секретный ключ.
+* `SQLALCHEMY_DATABASE_URI` - Адрес базы.
+* `SQLALCHEMY_TRACK_MODIFICATIONS` - Отслеживать изменения объектов в базе и посылать сигналы.
+* `PAGINATE_VALUE` - Количество записей на странице.
 
 ## Запуск приложения
 Для удобства приложение упаковано в Docker.
@@ -28,16 +29,16 @@
 Запустите сборку Docker-compose
 > sudo docker-compose up --build -d
 
-Сервер будет доступен по `localhost:8080`
+Сервер будет доступен по адресу `0.0.0.0:8080`
 
 ## API
 ### Создание автора:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request POST --data '{"name": "Artem", "sername": "Zaitsev"}' http://localhost:5000/authors
+curl --header "Content-Type: application/json" --request POST --data '{"name": "Artem", "sername": "Zaitsev"}' http://0.0.0.0:8080/authors
 ```
 #### URL
-`http://localhost:8080/authors`
+`http://0.0.0.0:8080/authors`
 #### Тип запроса
 `POST`
 #### JSON request data
@@ -54,7 +55,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"name": "
 ```
 {
   'success': True,
-  'message': 'Author <name> was created.'
+  'message': str
 }
 ```
 * `message` - Сообщение о том, какой пользователь был создан.
@@ -73,13 +74,13 @@ curl --header "Content-Type: application/json" --request POST --data '{"name": "
 #### Получение автора:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request GET http://localhost:5000/authors?id=1
+curl --header "Content-Type: application/json" --request GET http://0.0.0.0:8080/authors?id=1
 ```
 #### URL
-`http://localhost:5000/authors?id=1`
+`http://0.0.0.0:8080/authors?id=1`
 #### Тип запроса
 `GET`
-#### JSON request data
+#### Параметры запроса
 ```
 id - int
 ```
@@ -123,13 +124,13 @@ id - int
 #### Получение списка авторов:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request GET http://localhost:5000/authors?page=1&pagin=10
+curl --header "Content-Type: application/json" --request GET http://0.0.0.0:8080/authors?page=1&pagin=10
 ```
 #### URL
-`http://localhost:5000/authors?page=1&pagin=3`
+`http://0.0.0.0:8080/authors?page=1&pagin=3`
 #### Тип запроса
 `GET`
-#### JSON request data
+#### Параметры запроса
 ```
 page - int
 pagin - int
@@ -179,10 +180,10 @@ pagin - int
 ### Добавление книги к автору:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://localhost:5000/authors
+curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://0.0.0.0:8080/authors
 ```
 #### URL
-`http://localhost:8080/authors`
+`http://0.0.0.0:8080/authors`
 #### Тип запроса
 `PUT`
 #### JSON request data
@@ -218,10 +219,10 @@ curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id
 ### Создание книги:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request POST --data '{"name": "Book name", "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing", "authors": [1, 2]}' http://localhost:5000/books
+curl --header "Content-Type: application/json" --request POST --data '{"name": "Book name", "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing", "authors": [1, 2]}' http://0.0.0.0:8080/books
 ```
 #### URL
-`http://localhost:8080/books`
+`http://0.0.0.0:8080/books`
 #### Тип запроса
 `POST`
 #### JSON request data
@@ -258,9 +259,9 @@ curl --header "Content-Type: application/json" --request POST --data '{"name": "
 
 ### Добавление автора к книге:
 #### Curl пример
-`curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://localhost:5000/books`
+`curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://0.0.0.0:8080/books`
 #### URL
-`http://localhost:8080/books`
+`http://0.0.0.0:8080/books`
 #### Тип запроса
 `PUT`
 #### JSON request data
@@ -298,10 +299,10 @@ curl --header "Content-Type: application/json" --request POST --data '{"name": "
 #### Получение книги:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request GET http://localhost:5000/books?id=1
+curl --header "Content-Type: application/json" --request GET http://0.0.0.0:8080/books?id=1
 ```
 #### URL
-`http://localhost:5000/books?id=1`
+`http://0.0.0.0:8080/books?id=1`
 #### Тип запроса
 `GET`
 #### Параметры запроса
@@ -349,10 +350,10 @@ id - int
 #### Получение списка книг:
 #### Curl пример
 ```
-curl --request GET http://localhost:5000/books?page=1&pagin=10
+curl --request GET http://0.0.0.0:8080/books?page=1&pagin=10
 ```
 #### URL
-`http://localhost:5000/books?page=1&pagin=10`
+`http://0.0.0.0:8080/books?page=1&pagin=10`
 #### Тип запроса
 `GET`
 #### Параметры запроса
@@ -406,9 +407,9 @@ pagin - int
 
 ### Добавление оценки к книге:
 #### Curl пример
-```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://localhost:5000/books```
+```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://0.0.0.0:8080/books```
 #### URL
-`http://localhost:8080/books`
+`http://0.0.0.0:8080/books`
 #### Тип запроса
 `PATCH`
 #### JSON request data
