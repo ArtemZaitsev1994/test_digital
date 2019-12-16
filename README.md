@@ -219,7 +219,7 @@ curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id
 ### Создание книги:
 #### Curl пример
 ```
-curl --header "Content-Type: application/json" --request POST --data '{"name": "Book name", "description": "Lorem ipsum dolor sit amet, consectetuer adipiscing", "authors": [1, 2]}' http://0.0.0.0:8080/books
+curl --header "Content-Type: application/json" --request POST --data '{"book": {"name": "Kolobok", "description": "The story about bread."}, "author_id": [1, 2]}' http://0.0.0.0:8080/books
 ```
 #### URL
 `http://0.0.0.0:8080/books`
