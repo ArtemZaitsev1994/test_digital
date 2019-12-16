@@ -3,10 +3,10 @@
 Два Docker-контейнера: сервер с API, база данных mysql.
 
 ## Логика работы
-Сервер принимает запросы с JSON-данными и отвечает JSON-данными.
 Для начала создается Автор книг, потом создаются книги. Книги не могут быть созданы без автора - автор может быть создан без книг.
 
 ## Техническое описание
+Так как сервер подразумевается использовать совместно с SPA-приложением, то удобнее всего общаться с помощью JSON-формата. Сервер принимает запросы с JSON-данными и отвечает JSON-данными.
 Сервер работает на Flask-фреймворке. В качестве базы данных выступает mysql.
 
 Перменные окружения для приложения указаны в /server/.env файле.
@@ -29,7 +29,7 @@
 Запустите сборку Docker-compose
 > sudo docker-compose up --build -d
 
-Сервер будет доступен по адресу `0.0.0.0:8080`
+Приложение запускается не сразу, в особенности mysql - придется подождать. Сервер будет доступен по адресу `0.0.0.0:8080`
 
 ## API
 ### Создание автора:
@@ -115,7 +115,7 @@ id - int
 ```
 {
   'success': False,
-  'message': 'No book found with id=<id>'
+  'message': str
 }
 ```
 * `message` - Сообщение об ошибке.
@@ -136,7 +136,7 @@ page - int
 pagin - int
 ```
 * `page` - номер страницы.
-* `id` - количество авторов на странице, по умолчанию 3.
+* `pagin` - количество авторов на странице, по умолчанию 3.
 
 #### Success response
 ```
@@ -177,45 +177,6 @@ pagin - int
 * `pagination.prev_num` - Номер предыдущей страницы.
 * `pagination.pages` - Всего количество страниц.
 
-### Добавление книги к автору:
-#### Curl пример
-```
-curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://0.0.0.0:8080/authors
-```
-#### URL
-`http://0.0.0.0:8080/authors`
-#### Тип запроса
-`PUT`
-#### JSON request data
-```
-{
-  "author_id": int,
-  "book_id": [int, ]
-}
-```
-* `author_id` - ID автора.
-* `book_id` - ID книги.
-
-#### Success response
-```
-{
-  'success': True,
-  'message': str,
-}
-```
-* `message` - Сообщение о том, какие книги были добавлены.
-
-#### Fail response
-```
-{
-  'success': False,
-  'message': str,
-  'validation_error': dict[str, str]
-}
-```
-* `message` - Сообщение ошибки.
-* `validation_error` - Словарь ошибок.
-
 ### Создание книги:
 #### Curl пример
 ```
@@ -245,6 +206,45 @@ curl --header "Content-Type: application/json" --request POST --data '{"book": {
 }
 ```
 * `message` - Сообщение о том, какие авторы были найдены и к которым была добавлена книга.
+
+#### Fail response
+```
+{
+  'success': False,
+  'message': str,
+  'validation_error': dict[str, str]
+}
+```
+* `message` - Сообщение ошибки.
+* `validation_error` - Словарь ошибок.
+
+### Добавление книги к автору:
+#### Curl пример
+```
+curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id": [2, 3]}' --request PUT http://0.0.0.0:8080/authors
+```
+#### URL
+`http://0.0.0.0:8080/authors`
+#### Тип запроса
+`PUT`
+#### JSON request data
+```
+{
+  "author_id": int,
+  "book_id": [int, ]
+}
+```
+* `author_id` - ID автора.
+* `book_id` - Список ID книг.
+
+#### Success response
+```
+{
+  'success': True,
+  'message': str,
+}
+```
+* `message` - Сообщение о том, какие книги были добавлены.
 
 #### Fail response
 ```
@@ -294,7 +294,42 @@ curl --header "Content-Type: application/json" --request POST --data '{"book": {
 * `message` - Сообщение ошибки.
 * `validation_error` - Словарь ошибок.
 
+### Убрать связь между книгой и автором:
+#### Curl пример
+`curl --header "Content-Type: application/json" --data '{"book_id": 1, "author_id": 1}' --request PUT http://0.0.0.0:8080/authors`
+#### URL
+`http://0.0.0.0:8080/authors`
+#### Тип запроса
+`PATCH`
+#### JSON request data
+```
+{
+  "book_id": int,
+  "author_id": int
+}
+```
+* `book_id` - ID книги.
+* `author_id` - ID автора.
 
+#### Success response
+```
+{
+  'success': True,
+  'message': str,
+}
+```
+* `message` - Сообщение.
+
+#### Fail response
+```
+{
+  'success': False,
+  'message': str,
+  'validation_error': dict[str, str]
+}
+```
+* `message` - Сообщение ошибки.
+* `validation_error` - Словарь ошибок.
 
 #### Получение книги:
 #### Curl пример
@@ -344,8 +379,6 @@ id - int
 }
 ```
 * `message` - Сообщение об ошибке.
-
-
 
 #### Получение списка книг:
 #### Curl пример
@@ -403,8 +436,6 @@ pagin - int
 * `pagination.prev_num` - Номер предыдущей страницы.
 * `pagination.pages` - Всего количество страниц.
 
-
-
 ### Добавление оценки к книге:
 #### Curl пример
 ```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://0.0.0.0:8080/books```
@@ -420,7 +451,7 @@ pagin - int
 }
 ```
 * `book_id` - ID книги.
-* `rating` - Оценка книги.
+* `rating` - Оценка книги (целове число от 1 до 5).
 
 #### Success response
 ```
@@ -447,13 +478,22 @@ pagin - int
 * `validation_error` - Словарь ошибок.
 
 ## Тесты
-Для приложения подготовлены небольшие тесты. Тесты следует запускать при развернутом в Docker приложении, чтобы работа проводилась с развернутыми базами данных в контейнерах, дабы избежать потери данных.
+Для приложения подготовлены небольшие тесты. Тесты следует запускать при развернутой в Docker базе данных, дабы избежать потери данных. В файле data_test.py содержатся данные для тестов, в test.py - сами тесты.
 
 Разоваричаем проект:
 > sudo docker-compose up --build -d
 
 Останавливаем сервер:
-> sudo docker server stop
+> sudo docker stop server
+
+Разворачиваем виртуальное окружение:
+> python3 -m venv env
+
+Активируем виртуальное окружение:
+> source env/bin/activate
 
 Переходим в папку с тестами:
 > cd server
+
+Запускаем тесты:
+> python test.py
