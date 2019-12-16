@@ -27,7 +27,8 @@
 > cd test_digital
 
 Запустите сборку Docker-compose
-> sudo docker-compose up --build -d
+> sudo docker-compose build
+> sudo docker-compose up
 
 Приложение запускается не сразу, в особенности mysql - придется подождать. Сервер будет доступен по адресу `0.0.0.0:8080`
 
