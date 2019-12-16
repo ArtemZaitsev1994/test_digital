@@ -28,9 +28,13 @@ class Book(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+    
+    @staticmethod
+    def get_all():
+        return Book.query.all()
 
     @staticmethod
-    def get_one_user(id):
+    def get_one_item(id):
         return Book.query.get(id)
 
 
@@ -52,7 +56,11 @@ class Author(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+    
+    @staticmethod
+    def get_all():
+        return Author.query.all()
 
     @staticmethod
-    def get_one_user(id):
+    def get_one_item(id):
         return Author.query.get(id)

@@ -20,7 +20,7 @@ def authors_get():
     author_schema = AuthorSchemaExt()
 
     if author_id is not None and author_id.isdigit():
-        author = Author.get_one_user(author_id)
+        author = Author.get_one_item(author_id)
         if author is None:
             response = success_resp
             response['message'] = f'No book found with id={author_id}'
@@ -65,17 +65,19 @@ def authors_post():
     """Создание автора."""
     req_data = request.get_json()
     author_schema = AuthorSchemaExt()
+    e_response = error_resp
+    s_response = success_resp
 
     try:
         a = author_schema.load(req_data)
     except ValidationError as e:
-        error_resp['validation_error'] = e.messages
-        error_resp['message'] = 'Validation error.'
-        return jsonify(error_resp)
+        e_response['validation_error'] = e.messages
+        e_response['message'] = 'Validation error.'
+        return jsonify(e_response)
 
     a.save()
-    success_resp['message'] = f'Author {a.name} was created.'
-    return jsonify(success_resp)
+    s_response['message'] = f'Author {a.name} was created.'
+    return jsonify(s_response)
 
 
 @authors.route('', methods=['PUT'])
@@ -83,23 +85,28 @@ def authors_put():
     """Добавить книгу к автору."""
     data = request.get_json()
     schema = AuthorAddBookSchema()
+    e_response = error_resp
+    s_response = success_resp
 
     try:
         a, books_id = schema.load(data)
+        if a is None:
+            e_response['message'] = f'Not found author with id={data["author_id"]}.'
+            return jsonify(e_response)
     except ValidationError as e:
-        error_resp['validation_error'] = e.messages
-        error_resp['message'] = 'Validation error.'
-        return jsonify(error_resp)
+        e_response['validation_error'] = e.messages
+        e_response['message'] = 'Validation error.'
+        return jsonify(e_response)
 
     list_b = Book.query.filter(Book.book_id.in_(books_id))
     if list_b.count() <= 0:
-        error_resp['messages'] = f'Noone books found with id: {", ".join([str(x) for x in books_id])}.'
-        return jsonify(error_resp)
+        e_response['messages'] = f'Noone books found with id: {", ".join([str(x) for x in books_id])}.'
+        return jsonify(e_response)
 
     found_books = []
     for b in list_b:
         found_books.append(b.book_id)
         a.books.append(b)
     a.save()
-    success_resp['message'] = f'Books was found with id: {", ".join([str(x) for x in found_books])}.'
-    return jsonify(success_resp)
+    s_response['message'] = f'Books was found with id: {", ".join([str(x) for x in found_books])}.'
+    return jsonify(s_response)

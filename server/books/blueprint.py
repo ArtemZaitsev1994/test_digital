@@ -22,7 +22,7 @@ def books_get():
 
     if book_id is not None and book_id.isdigit():
         # Получить книгу по ID
-        book = Author.get_one_user(book_id)
+        book = Book.get_one_item(book_id)
         if book is None:
             response = success_resp
             response['message'] = f'No book found with id={book_id}'
@@ -64,6 +64,8 @@ def books_get():
 def books_post():
     """Создание/изменение книги книги"""
     data = request.get_json()
+    e_response = error_resp
+    s_response = success_resp
 
     if request.method == 'POST':
         """Создание книги"""
@@ -72,18 +74,17 @@ def books_post():
 
         try:
             b = book_schema.load(data['book'])
-            # b = book_schema.load(data)
         except ValidationError as e:
-            error_resp['validation_error'] = e.messages
-            error_resp['message'] = 'Validation error.'
-            return jsonify(error_resp)
+            e_response['validation_error'] = e.messages
+            e_response['message'] = 'Validation error.'
+            return jsonify(e_response)
 
         try:
             author_id = schema.load({'author_id': data['author_id']})
         except ValidationError as e:
-            error_resp['validation_error'] = e.messages
-            error_resp['message'] = 'Validation error.'
-            return jsonify(error_resp)
+            e_response['validation_error'] = e.messages
+            e_response['message'] = 'Validation error.'
+            return jsonify(e_response)
 
 
     elif request.method == 'PUT':
@@ -92,22 +93,22 @@ def books_post():
         try:
             b, author_id = schema.load(data)
         except ValidationError as e:
-            error_resp['validation_error'] = e.messages
-            error_resp['message'] = 'Validation error.'
-            return jsonify(error_resp)
+            e_response['validation_error'] = e.messages
+            e_response['message'] = 'Validation error.'
+            return jsonify(e_response)
 
 
     list_a = Author.query.filter(Author.author_id.in_(author_id))
     if list_a.count() <= 0:
-        error_resp['messages'] = f'Noone authors found with id: {", ".join([str(x) for x in author_id])}.'
-        return jsonify(error_resp)
+        e_response['messages'] = f'Noone authors found with id: {", ".join([str(x) for x in author_id])}.'
+        return jsonify(e_response)
     found_authors = []
     for a in list_a:
         found_authors.append(a.author_id)
         a.books.append(b)
     b.save()
-    success_resp['message'] = f'Found authors: {", ".join([str(x) for x in found_authors])}.'
-    return jsonify(success_resp)
+    s_response['message'] = f'Found authors: {", ".join([str(x) for x in found_authors])}.'
+    return jsonify(s_response)
 
 
 @books.route('', methods=['PATCH'])
@@ -115,22 +116,24 @@ def books_patch():
     """Добавление оценки к книге"""
     data = request.get_json()
     schema = BookRatingSchema()
+    e_response = error_resp
+    s_response = success_resp
    
     try:
         b, rating = schema.load(data)
     except ValidationError as e:
-        error_resp['validation_error'] = e.messages
-        error_resp['message'] = 'Validation error.'
-        return jsonify(error_resp)
+        e_response['validation_error'] = e.messages
+        e_response['message'] = 'Validation error.'
+        return jsonify(e_response)
 
     if b is None:
-        error_resp['message'] = f'No book found with id={data["book_id"]}'
-        return jsonify(error_resp)
+        e_response['message'] = f'No book found with id={data["book_id"]}'
+        return jsonify(e_response)
 
     b.count_marks += 1
     b.rating = (b.rating * (b.count_marks - 1) + rating) / b.count_marks
     b.save()
-    success_resp['message'] = f'New rating {b.rating} for {b.count_marks} votes.'
-    success_resp['rating'] = b.rating
-    success_resp['votes'] = b.count_marks
-    return jsonify(success_resp)
+    s_response['message'] = f'New rating {b.rating} for {b.count_marks} votes.'
+    s_response['rating'] = b.rating
+    s_response['votes'] = b.count_marks
+    return jsonify(s_response)

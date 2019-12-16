@@ -43,7 +43,7 @@ class AuthorAddBookSchema(Schema):
 
     @post_load
     def make_author(self, data, **kwargs):
-        a = Author.get_one_user(data['author_id'])
+        a = Author.get_one_item(data['author_id'])
         return a, data['book_id']
 
 
@@ -53,7 +53,7 @@ class BookAddAuthorSchema(Schema):
 
     @post_load
     def make_author(self, data, **kwargs):
-        b = Book.get_one_user(data['book_id'])
+        b = Book.get_one_item(data['book_id'])
         return b, data['author_id']
 
 
@@ -80,5 +80,5 @@ class BookRatingSchema(Schema):
 
     @post_load
     def make_author(self, data, **kwargs):
-        b = Book.get_one_user(data['book_id'])
+        b = Book.get_one_item(data['book_id'])
         return b, data['rating']
