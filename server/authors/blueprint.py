@@ -90,12 +90,12 @@ def authors_put():
 
     try:
         a, books_id = schema.load(data)
-        if a is None:
-            e_response['message'] = f'Not found author with id={data["author_id"]}.'
-            return jsonify(e_response)
     except ValidationError as e:
         e_response['validation_error'] = e.messages
         e_response['message'] = 'Validation error.'
+        return jsonify(e_response)
+    if a is None:
+        e_response['message'] = f'Not found author with id={data["author_id"]}.'
         return jsonify(e_response)
 
     list_b = Book.query.filter(Book.book_id.in_(books_id))

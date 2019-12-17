@@ -78,6 +78,9 @@ def books_post():
             e_response['validation_error'] = e.messages
             e_response['message'] = 'Validation error.'
             return jsonify(e_response)
+        if b is None:
+            e_response['message'] = f'Not found book with id={data["book_id"]}.'
+            return jsonify(e_response)
 
         try:
             author_id = schema.load({'author_id': data['author_id']})
@@ -95,6 +98,9 @@ def books_post():
         except ValidationError as e:
             e_response['validation_error'] = e.messages
             e_response['message'] = 'Validation error.'
+            return jsonify(e_response)
+        if b is None:
+            e_response['message'] = f'Not found book with id={data["book_id"]}.'
             return jsonify(e_response)
 
 
