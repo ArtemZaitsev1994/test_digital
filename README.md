@@ -261,7 +261,9 @@ curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id
 
 ### Добавление автора к книге:
 #### Curl пример
-```curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://0.0.0.0:8080/books```
+```
+curl --header "Content-Type: application/json" --data '{"book_id": 22, "author_id": [18]}' --request PUT http://0.0.0.0:8080/books
+```
 #### URL
 `http://0.0.0.0:8080/books`
 #### Тип запроса
@@ -298,7 +300,9 @@ curl --header "Content-Type: application/json" --data '{"author_id": 1, "book_id
 
 ### Убрать связь между книгой и автором:
 #### Curl пример
-```curl --header "Content-Type: application/json" --data '{"book_id": 1, "author_id": 1}' --request PATCH http://0.0.0.0:8080/authors```
+```
+curl --header "Content-Type: application/json" --data '{"book_id": 1, "author_id": 1}' --request PATCH http://0.0.0.0:8080/authors
+```
 #### URL
 `http://0.0.0.0:8080/authors`
 #### Тип запроса
@@ -440,7 +444,9 @@ pagin - int
 
 ### Добавление оценки к книге:
 #### Curl пример
-```curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://0.0.0.0:8080/books```
+```
+curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 5}' --request PATCH http://0.0.0.0:8080/books
+```
 #### URL
 `http://0.0.0.0:8080/books`
 #### Тип запроса
