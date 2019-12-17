@@ -503,11 +503,6 @@ curl --header "Content-Type: application/json" --data '{"book_id": 1, "rating": 
 Переходим в папку с тестами:
 > cd server
 
-В файле `.env` нужно изменить адрес базы данных с
-`mysql+mysqlconnector://root:root@mysql/test_db?charset=utf8`
-на
-`mysql+mysqlconnector://root:root@localhost/test_db?charset=utf8`
-
 Запускаем тесты:
 > python test.py
 
